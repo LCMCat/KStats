@@ -1,0 +1,30 @@
+# messages.yml
+# 命令反馈消息
+config-reloaded: "&a[钾属性] 配置重载成功！"
+player-not-found: "&c错误：目标玩家不在线！"
+no-permission: "&c你没有权限使用该命令。"
+player-command: "&c此命令仅供玩家使用。"
+no-available-command: "&c没有可供使用的命令。"
+command-list-header: "&6==== 钾属性 KStats ===="
+command-usage: "&c命令使用方法: %s"
+
+# 属性显示格式
+stat-header: "&6===== &e%s &6的属性 ====="
+health-display: "&c❤ 生命值: &7%.1f"
+defense-display: "&9🛡 防御值: &7%.1f"
+strength-display: "&4💪 力量值: &7%.1f"
+speed-display: "&b🏃 速度加成: &7%.1f%%"
+crit-chance-display: "&d🎯 暴击概率: &7%.1f%%"
+crit-damage-display: "&5🔥 暴击伤害: &7%.1f%%"
+wisdom-display: "&3📚 智慧值: &7%.1f"
+base-damage-display: "&6⚔ 基准伤害: &7%.1f"
+damage-multiplier-display: "&c✨ 伤害倍率: &7%.1fx"
+healing-display: "&a💊 生命恢复: &7%.1f/2秒"
+
+# 战斗提示
+critical-hit: "&6✧ 暴击触发！伤害 %.1f%%"
+healing-message: "&a♨ 恢复了 %.1f 点生命值"
+
+# 异常处理
+invalid-stat-type: "&c错误：无效的属性类型"
+data-load-failed: "&c错误：玩家数据加载失败"

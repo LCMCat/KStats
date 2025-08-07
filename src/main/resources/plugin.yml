@@ -1,0 +1,19 @@
+# plugin.yml
+name: KStats
+main: tech.ccat.kstats.KStats
+version: 1.0
+api-version: 1.21
+commands:
+  kstats:
+    description: Manage player stats
+    usage: |
+      /kstats show [player]
+      /kstats reload
+    aliases: [stats]
+permissions:
+  kstats.admin:
+    description: Admin permissions
+    default: op
+  kstats.use:
+    description: Use basic commands
+    default: true
