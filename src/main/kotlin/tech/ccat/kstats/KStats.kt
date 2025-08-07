@@ -1,7 +1,7 @@
-// tech/ccat/kstats/KStats.kt
 package tech.ccat.kstats
 
 import org.bukkit.Bukkit
+import org.bukkit.GameRule
 import org.bukkit.plugin.java.JavaPlugin
 import tech.ccat.kstats.listener.SpeedListener
 import tech.ccat.kstats.command.CommandManager
@@ -31,7 +31,7 @@ class KStats : JavaPlugin() {
         saveDefaultConfig()
 
         // 初始化核心模块
-        configManager = ConfigManager(this).apply { setup() }
+        configManager = ConfigManager().apply { setup() }
         cacheService = CacheService()
         statManager = StatManager(cacheService, configManager)
         statController = StatController(statManager)
@@ -40,7 +40,7 @@ class KStats : JavaPlugin() {
         registerListeners()
 
         // 初始化命令系统
-        commandManager = CommandManager(this).apply {
+        commandManager = CommandManager().apply {
             registerCommand(ShowCommand())
             registerCommand(ReloadCommand())
         }
@@ -49,7 +49,7 @@ class KStats : JavaPlugin() {
 
         // 关闭原版恢复
         Bukkit.getWorlds().forEach { world ->
-            world.setGameRuleValue("naturalRegeneration", "false")
+            world.setGameRule(GameRule.NATURAL_REGENERATION, false)
         }
     }
 

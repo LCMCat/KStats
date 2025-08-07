@@ -1,10 +1,12 @@
 package tech.ccat.kstats.config
 
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.plugin.java.JavaPlugin
+import tech.ccat.kstats.KStats
 import java.io.File
 
-class ConfigManager(private val plugin: JavaPlugin) {
+class ConfigManager() {
+    private val plugin = KStats.instance
+
     private val configs = mutableMapOf<String, YamlConfiguration>()
     private val configFiles = mutableMapOf<String, File>()
 

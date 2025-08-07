@@ -1,4 +1,3 @@
-// tech/ccat/kstats/task/HealingTask.kt
 package tech.ccat.kstats.task
 
 import org.bukkit.entity.Player

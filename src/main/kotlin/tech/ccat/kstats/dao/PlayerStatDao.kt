@@ -1,4 +1,3 @@
-// tech/ccat/kstats/dao/PlayerStatDao.kt
 package tech.ccat.kstats.dao
 
 import tech.ccat.kstats.model.PlayerStat

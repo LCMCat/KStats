@@ -4,15 +4,13 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
-import org.bukkit.plugin.java.JavaPlugin
 import tech.ccat.kstats.util.MessageFormatter
 
-class CommandManager(private val plugin: JavaPlugin) : TabExecutor {
+class CommandManager() : TabExecutor {
     private val commands = mutableMapOf<String, AbstractCommand>()
 
     fun registerCommand(command: AbstractCommand) {
         commands[command.name] = command
-//        plugin.getCommand(command.name)?.setExecutor(this)
     }
 
     override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
