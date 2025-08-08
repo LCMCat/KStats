@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly(files("lib/HSubTitle-1.0-SNAPSHOT.jar"))
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
     implementation("org.mongodb:mongodb-driver-sync:5.4.0")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")

@@ -3,6 +3,8 @@ name: KStats
 main: tech.ccat.kstats.KStats
 version: 1.0
 api-version: 1.21
+depend:
+  - HSubTitle
 commands:
   kstats:
     description: Manage player stats

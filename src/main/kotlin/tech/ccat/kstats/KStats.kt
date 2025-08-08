@@ -5,6 +5,7 @@ import org.bukkit.GameRule
 import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
+import tech.ccat.hsubtitle.api.HSubTitleAPI
 import tech.ccat.kstats.api.KStatsAPI
 import tech.ccat.kstats.api.StatProvider
 import tech.ccat.kstats.command.CommandManager
@@ -15,6 +16,8 @@ import tech.ccat.kstats.listener.*
 import tech.ccat.kstats.model.StatType
 import tech.ccat.kstats.service.CacheService
 import tech.ccat.kstats.service.StatManager
+import tech.ccat.kstats.subtitle.DefenseProvider
+import tech.ccat.kstats.subtitle.HealthProvider
 
 class KStats : JavaPlugin(), KStatsAPI {
 
@@ -23,6 +26,9 @@ class KStats : JavaPlugin(), KStatsAPI {
     internal lateinit var cacheService: CacheService
     internal lateinit var statManager: StatManager
     internal lateinit var commandManager: CommandManager
+
+    //外置API
+    private lateinit var subTitleApi: HSubTitleAPI
 
     companion object {
         internal lateinit var instance: KStats
@@ -53,6 +59,9 @@ class KStats : JavaPlugin(), KStatsAPI {
             world.setGameRule(GameRule.NATURAL_REGENERATION, false)
         }
 
+        //注册Provider
+        registerSubTitles()
+
         // 将自身注册为服务提供者 (Bukkit方式)
         server.servicesManager.register(
             KStatsAPI::class.java,
@@ -77,7 +86,25 @@ class KStats : JavaPlugin(), KStatsAPI {
         // 取消服务注册
         server.servicesManager.unregister(this)
 
+        //卸载Provider
+        if (::subTitleApi.isInitialized) {
+            subTitleApi.unregisterProvider(HealthProvider)
+            subTitleApi.unregisterProvider(DefenseProvider)
+        }
+
         logger.info("KStats已禁用")
+    }
+
+    private fun registerSubTitles(){
+        val registration = Bukkit.getServicesManager().getRegistration(HSubTitleAPI::class.java)
+        if (registration != null) {
+            subTitleApi = registration.provider
+            subTitleApi.registerProvider(HealthProvider)
+            subTitleApi.registerProvider(DefenseProvider)
+            logger.info("已注册到 HSubTitle v${registration.plugin.description.version}")
+        } else {
+            logger.warning("HSubTitle API 未找到，动作条功能将不可用")
+        }
     }
 
     private fun registerListeners() {
