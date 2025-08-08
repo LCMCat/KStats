@@ -18,6 +18,7 @@ import tech.ccat.kstats.service.CacheService
 import tech.ccat.kstats.service.StatManager
 import tech.ccat.kstats.subtitle.DefenseProvider
 import tech.ccat.kstats.subtitle.HealthProvider
+import tech.ccat.kstats.task.HealingTask
 
 class KStats : JavaPlugin(), KStatsAPI {
 
@@ -29,6 +30,9 @@ class KStats : JavaPlugin(), KStatsAPI {
 
     //外置API
     private lateinit var subTitleApi: HSubTitleAPI
+
+    //一个监听器
+    private lateinit var healingListener: HealingListener
 
     companion object {
         internal lateinit var instance: KStats
@@ -71,6 +75,10 @@ class KStats : JavaPlugin(), KStatsAPI {
         )
 
         logger.info("KStats已启用。API版本: ${description.version}")
+
+        if(!Bukkit.getOnlinePlayers().isEmpty()){
+            midInitPlayerStat()
+        }
     }
 
     /**
@@ -109,12 +117,25 @@ class KStats : JavaPlugin(), KStatsAPI {
 
     private fun registerListeners() {
         val pm = Bukkit.getPluginManager()
+
+        healingListener = HealingListener()
+
         pm.registerEvents(DamageListener(), this)
         pm.registerEvents(CriticalHitListener(), this)
         pm.registerEvents(SpeedListener(), this)
-        pm.registerEvents(HealingListener(), this)
+        pm.registerEvents(healingListener, this)
         pm.registerEvents(StatUpdateListener(), this)
         pm.registerEvents(PlayerLoginListener(), this)
+    }
+
+    //如果插件在服务器运行中被Bukkit的插件管理器重载，则使用次方法加载未被监听器加载的玩家数据
+    private fun midInitPlayerStat(){
+        Bukkit.getOnlinePlayers().forEach {
+            statManager.initPlayerStats(it)
+            statManager.updateStats(it)
+
+            healingListener.addPlayerToTask(it)
+        }
     }
 
     // ============ KStatsAPI 实现 ============

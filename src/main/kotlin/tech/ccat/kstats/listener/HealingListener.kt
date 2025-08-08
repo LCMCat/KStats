@@ -1,5 +1,6 @@
 package tech.ccat.kstats.listener
 
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -10,12 +11,16 @@ import java.util.UUID
 class HealingListener : Listener {
     private val tasks = hashMapOf<UUID, HealingTask>()
 
-    @EventHandler
-    fun onJoin(event: PlayerJoinEvent) {
-        val player = event.player
+    internal fun addPlayerToTask(player: Player){
         tasks[player.uniqueId] = HealingTask(player).apply {
             start()
         }
+    }
+
+    @EventHandler
+    fun onJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        addPlayerToTask(player)
     }
 
     @EventHandler
