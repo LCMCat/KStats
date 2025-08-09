@@ -99,4 +99,12 @@ class StatManager(
     fun getStat(player: Player, statType: StatType): Double {
         return getAllStats(player).getStatValue(statType)
     }
+
+    /**
+     * 获取已注册的Provider
+     * @return CopyOnWriteArrayList<StatProvider>()
+     */
+    fun getRegisteredProviders(): CopyOnWriteArrayList<StatProvider>? {
+        return providers
+    }
 }

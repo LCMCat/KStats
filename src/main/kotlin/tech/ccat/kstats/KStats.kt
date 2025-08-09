@@ -19,6 +19,8 @@ import tech.ccat.kstats.service.StatManager
 import tech.ccat.kstats.subtitle.DefenseProvider
 import tech.ccat.kstats.subtitle.HealthProvider
 import tech.ccat.kstats.task.HealingTask
+import java.util.ArrayList
+import java.util.concurrent.CopyOnWriteArrayList
 
 class KStats : JavaPlugin(), KStatsAPI {
 
@@ -160,5 +162,9 @@ class KStats : JavaPlugin(), KStatsAPI {
 
     override fun forceUpdateAll() {
         Bukkit.getOnlinePlayers().forEach(::forceUpdate)
+    }
+
+    override fun getRegisteredProviders(): CopyOnWriteArrayList<StatProvider>? {
+        return statManager.getRegisteredProviders()
     }
 }

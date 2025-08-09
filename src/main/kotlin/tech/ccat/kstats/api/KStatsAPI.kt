@@ -3,6 +3,8 @@ package tech.ccat.kstats.api
 import org.bukkit.entity.Player
 import tech.ccat.kstats.model.PlayerStat
 import tech.ccat.kstats.model.StatType
+import java.util.ArrayList
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * KStats插件的主要API接口，提供访问玩家状态数据和注册状态提供者的能力
@@ -60,4 +62,9 @@ interface KStatsAPI {
      * 强制更新所有在线玩家的状态数据
      */
     fun forceUpdateAll()
+
+    /**
+     * 获取所有已注册的Provider
+     */
+    fun getRegisteredProviders(): CopyOnWriteArrayList<StatProvider>?
 }
