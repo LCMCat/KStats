@@ -3,7 +3,6 @@ package tech.ccat.kstats.api
 import org.bukkit.entity.Player
 import tech.ccat.kstats.model.PlayerStat
 import tech.ccat.kstats.model.StatType
-import java.util.ArrayList
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -67,4 +66,19 @@ interface KStatsAPI {
      * 获取所有已注册的Provider
      */
     fun getRegisteredProviders(): CopyOnWriteArrayList<StatProvider>?
+
+    /**
+     * 请求更新玩家状态数据（带防抖）
+     *
+     * 短时间内的多次调用会被合并为一次实际更新，
+     * 适用于高频触发场景（如物品切换）
+     *
+     * @param player 要更新的玩家
+     */
+    fun requestUpdate(player: Player)
+
+    /**
+     * 请求更新所有在线玩家的状态数据（带防抖）
+     */
+    fun requestUpdateAll()
 }

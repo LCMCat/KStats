@@ -18,8 +18,6 @@ import tech.ccat.kstats.service.CacheService
 import tech.ccat.kstats.service.StatManager
 import tech.ccat.kstats.subtitle.DefenseProvider
 import tech.ccat.kstats.subtitle.HealthProvider
-import tech.ccat.kstats.task.HealingTask
-import java.util.ArrayList
 import java.util.concurrent.CopyOnWriteArrayList
 
 class KStats : JavaPlugin(), KStatsAPI {
@@ -48,7 +46,9 @@ class KStats : JavaPlugin(), KStatsAPI {
         // 初始化核心模块
         configManager = ConfigManager().apply { setup() }
         cacheService = CacheService()
-        statManager = StatManager(cacheService, configManager)
+        statManager = StatManager(cacheService, configManager).apply {
+            setDebounceDelay(configManager.statConfig.getDebounceDelay())
+        }
 
         // 注册事件监听器
         registerListeners()
@@ -166,5 +166,13 @@ class KStats : JavaPlugin(), KStatsAPI {
 
     override fun getRegisteredProviders(): CopyOnWriteArrayList<StatProvider>? {
         return statManager.getRegisteredProviders()
+    }
+
+    override fun requestUpdate(player: Player) {
+        statManager.requestUpdate(player)
+    }
+
+    override fun requestUpdateAll() {
+        Bukkit.getOnlinePlayers().forEach { requestUpdate(it) }
     }
 }

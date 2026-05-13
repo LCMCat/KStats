@@ -2,22 +2,16 @@ package tech.ccat.kstats.service
 
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import tech.ccat.kstats.KStats
 import tech.ccat.kstats.api.StatProvider
 import tech.ccat.kstats.config.ConfigManager
 import tech.ccat.kstats.event.StatUpdateEvent
 import tech.ccat.kstats.model.PlayerStat
 import tech.ccat.kstats.model.StatType
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
-/**
- * 状态管理器，负责：
- * 1. 管理所有状态提供者
- * 2. 计算并缓存玩家状态值
- * 3. 提供状态查询接口
- *
- * @property cacheService 缓存服务
- * @property configManager 配置管理器
- */
 class StatManager(
     private val cacheService: CacheService,
     private val configManager: ConfigManager
@@ -27,6 +21,13 @@ class StatManager(
 
     private val providers = CopyOnWriteArrayList<StatProvider>()
     private val summationEngine: SummationEngine = SummationEngine(providers)
+
+    private val pendingUpdates = ConcurrentHashMap<UUID, Long>()
+    private var debounceDelay: Long = 50L
+
+    fun setDebounceDelay(delay: Long) {
+        debounceDelay = delay
+    }
 
     /**
      * 初始化玩家状态数据
@@ -106,5 +107,36 @@ class StatManager(
      */
     fun getRegisteredProviders(): CopyOnWriteArrayList<StatProvider>? {
         return providers
+    }
+
+    /**
+     * 请求更新玩家状态数据（带防抖）
+     *
+     * 短时间内的多次调用会被合并为一次实际更新，
+     * 适用于高频触发场景（如物品切换）
+     *
+     * @param player 要更新的玩家
+     */
+    fun requestUpdate(player: Player) {
+        val now = System.currentTimeMillis()
+        val lastRequest = pendingUpdates.getOrDefault(player.uniqueId, 0L)
+
+        if (now - lastRequest >= debounceDelay) {
+            pendingUpdates[player.uniqueId] = now
+            scheduleUpdate(player)
+        }
+    }
+
+    /**
+     * 调度延迟更新任务
+     * @param player 目标玩家
+     */
+    private fun scheduleUpdate(player: Player) {
+        Bukkit.getScheduler().runTaskLater(KStats.instance, Runnable {
+            pendingUpdates.remove(player.uniqueId)
+            if (player.isOnline) {
+                updateStats(player)
+            }
+        }, 1L)
     }
 }
