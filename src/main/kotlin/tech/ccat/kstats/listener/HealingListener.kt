@@ -6,13 +6,18 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import tech.ccat.kstats.task.HealingTask
+import tech.ccat.kstats.task.ManaRegenTask
 import java.util.UUID
 
 class HealingListener : Listener {
-    private val tasks = hashMapOf<UUID, HealingTask>()
+    private val healingTasks = hashMapOf<UUID, HealingTask>()
+    private val manaRegenTasks = hashMapOf<UUID, ManaRegenTask>()
 
     internal fun addPlayerToTask(player: Player){
-        tasks[player.uniqueId] = HealingTask(player).apply {
+        healingTasks[player.uniqueId] = HealingTask(player).apply {
+            start()
+        }
+        manaRegenTasks[player.uniqueId] = ManaRegenTask(player).apply {
             start()
         }
     }
@@ -25,6 +30,8 @@ class HealingListener : Listener {
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
-        tasks.remove(event.player.uniqueId)?.cancel()
+        val uuid = event.player.uniqueId
+        healingTasks.remove(uuid)?.cancel()
+        manaRegenTasks.remove(uuid)?.cancel()
     }
 }

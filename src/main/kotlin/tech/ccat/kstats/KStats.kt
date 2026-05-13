@@ -12,12 +12,14 @@ import tech.ccat.kstats.command.CommandManager
 import tech.ccat.kstats.command.ReloadCommand
 import tech.ccat.kstats.command.ShowCommand
 import tech.ccat.kstats.config.ConfigManager
+import tech.ccat.kstats.event.ManaConsumptionEvent
 import tech.ccat.kstats.listener.*
 import tech.ccat.kstats.model.StatType
 import tech.ccat.kstats.service.CacheService
 import tech.ccat.kstats.service.StatManager
 import tech.ccat.kstats.subtitle.DefenseProvider
 import tech.ccat.kstats.subtitle.HealthProvider
+import tech.ccat.kstats.subtitle.ManaProvider
 import java.util.concurrent.CopyOnWriteArrayList
 
 class KStats : JavaPlugin(), KStatsAPI {
@@ -76,7 +78,7 @@ class KStats : JavaPlugin(), KStatsAPI {
             ServicePriority.Normal
         )
 
-        logger.info("KStats已启用。API版本: ${description.version}")
+        logger.info("KStats已启用。API版本: ${getDescription().version}")
 
         if(!Bukkit.getOnlinePlayers().isEmpty()){
             midInitPlayerStat()
@@ -100,6 +102,7 @@ class KStats : JavaPlugin(), KStatsAPI {
         if (::subTitleApi.isInitialized) {
             subTitleApi.unregisterProvider(HealthProvider)
             subTitleApi.unregisterProvider(DefenseProvider)
+            subTitleApi.unregisterProvider(ManaProvider)
         }
 
         logger.info("KStats已禁用")
@@ -111,7 +114,8 @@ class KStats : JavaPlugin(), KStatsAPI {
             subTitleApi = registration.provider
             subTitleApi.registerProvider(HealthProvider)
             subTitleApi.registerProvider(DefenseProvider)
-            logger.info("已注册到 HSubTitle v${registration.plugin.description.version}")
+            subTitleApi.registerProvider(ManaProvider)
+            logger.info("已注册到 HSubTitle v${registration.plugin.getDescription().version}")
         } else {
             logger.warning("HSubTitle API 未找到，动作条功能将不可用")
         }
@@ -174,5 +178,55 @@ class KStats : JavaPlugin(), KStatsAPI {
 
     override fun requestUpdateAll() {
         Bukkit.getOnlinePlayers().forEach { requestUpdate(it) }
+    }
+
+    override fun getMana(player: Player): Double {
+        return cacheService.getMana(player.uniqueId)
+    }
+
+    override fun getMaxMana(player: Player): Double {
+        return getStat(player, StatType.WISDOM)
+    }
+
+    override fun consumeMana(player: Player, amount: Double): Boolean {
+        return consumeMana(player, amount, false)
+    }
+
+    override fun consumeMana(player: Player, amount: Double, showAlert: Boolean): Boolean {
+        return consumeMana(player, amount, "", showAlert)
+    }
+
+    override fun consumeMana(player: Player, amount: Double, reason: String): Boolean {
+        return consumeMana(player, amount, reason, true)
+    }
+
+    override fun consumeMana(player: Player, amount: Double, reason: String, showAlert: Boolean): Boolean {
+        val currentMana = getMana(player)
+        if (currentMana < amount) {
+            if (showAlert) {
+                ManaProvider.showAlert(player.uniqueId, "§c§l法力不足", 2000L)
+            }
+            return false
+        }
+        cacheService.setMana(player.uniqueId, currentMana - amount)
+
+        if (reason.isNotEmpty()) {
+            ManaProvider.showConsumption(player.uniqueId, amount, reason, 2000L)
+        }
+
+        Bukkit.getPluginManager().callEvent(ManaConsumptionEvent(player, amount, reason))
+        return true
+    }
+
+    override fun restoreMana(player: Player, amount: Double) {
+        val maxMana = getMaxMana(player)
+        val newMana = (getMana(player) + amount).coerceAtMost(maxMana)
+        cacheService.setMana(player.uniqueId, newMana)
+    }
+
+    override fun setMana(player: Player, amount: Double) {
+        val maxMana = getMaxMana(player)
+        val clampedAmount = amount.coerceIn(0.0, maxMana)
+        cacheService.setMana(player.uniqueId, clampedAmount)
     }
 }

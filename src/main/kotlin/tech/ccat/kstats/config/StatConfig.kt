@@ -14,7 +14,8 @@ class StatConfig(private val config: ConfigurationSection) {
         wisdom = config.getDouble("defaults.wisdom", 100.0),
         baseDamage = config.getDouble("defaults.base-damage", 1.0),
         damageMultiplier = config.getDouble("defaults.damage-multiplier", 1.0),
-        healing = config.getDouble("defaults.healing", 100.0)
+        healing = config.getDouble("defaults.healing", 100.0),
+        manaRegen = config.getDouble("defaults.mana-regen", 0.0)
     )
 
     fun getDebounceDelay(): Long {

@@ -12,7 +12,8 @@ data class PlayerStat(
     var wisdom: Double = 100.0,
     var baseDamage: Double = 1.0,
     var damageMultiplier: Double = 1.0,
-    var healing: Double = 100.0
+    var healing: Double = 100.0,
+    var manaRegen: Double = 0.0
 ) : ConfigurationSerializable {
     companion object {
         @JvmStatic
@@ -26,7 +27,8 @@ data class PlayerStat(
             wisdom = map["wisdom"] as? Double ?: 100.0,
             baseDamage = map["baseDamage"] as? Double ?: 1.0,
             damageMultiplier = map["damageMultiplier"] as? Double ?: 1.0,
-            healing = map["healing"] as? Double ?: 100.0
+            healing = map["healing"] as? Double ?: 100.0,
+            manaRegen = map["manaRegen"] as? Double ?: 0.0
         )
     }
 
@@ -40,7 +42,8 @@ data class PlayerStat(
         "wisdom" to wisdom,
         "baseDamage" to baseDamage,
         "damageMultiplier" to damageMultiplier,
-        "healing" to healing
+        "healing" to healing,
+        "manaRegen" to manaRegen
     )
 
     fun getStatValue(type: StatType): Double = when (type) {
@@ -54,6 +57,7 @@ data class PlayerStat(
         StatType.BASE_DAMAGE -> baseDamage
         StatType.DAMAGE_MULTIPLIER -> damageMultiplier
         StatType.HEALING -> healing
+        StatType.MANA_REGEN -> manaRegen
     }
 
     fun addAllStats(other: PlayerStat) {
@@ -67,5 +71,6 @@ data class PlayerStat(
         baseDamage = this.baseDamage + other.baseDamage
         damageMultiplier = this.damageMultiplier + other.damageMultiplier
         healing = this.healing + other.healing
+        manaRegen = this.manaRegen + other.manaRegen
     }
 }

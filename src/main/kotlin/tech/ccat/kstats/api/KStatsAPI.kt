@@ -81,4 +81,76 @@ interface KStatsAPI {
      * 请求更新所有在线玩家的状态数据（带防抖）
      */
     fun requestUpdateAll()
+
+    /**
+     * 获取玩家当前法力值
+     *
+     * @param player 目标玩家
+     * @return 当前法力值
+     */
+    fun getMana(player: Player): Double
+
+    /**
+     * 获取玩家最大法力值（即 wisdom 属性）
+     *
+     * @param player 目标玩家
+     * @return 最大法力值
+     */
+    fun getMaxMana(player: Player): Double
+
+    /**
+     * 消耗玩家法力值
+     *
+     * @param player 目标玩家
+     * @param amount 消耗数量
+     * @return 是否消耗成功（法力不足时返回 false）
+     */
+    fun consumeMana(player: Player, amount: Double): Boolean
+
+    /**
+     * 消耗玩家法力值
+     *
+     * @param player 目标玩家
+     * @param amount 消耗数量
+     * @param showAlert 法力不足时是否显示提示（替换法力显示为"§c§l法力不足"，持续2秒）
+     * @return 是否消耗成功（法力不足时返回 false）
+     */
+    fun consumeMana(player: Player, amount: Double, showAlert: Boolean): Boolean
+
+    /**
+     * 消耗玩家法力值（带消耗原因，默认显示消耗信息）
+     *
+     * @param player 目标玩家
+     * @param amount 消耗数量
+     * @param reason 消耗原因（如技能名称）
+     * @return 是否消耗成功（法力不足时返回 false）
+     */
+    fun consumeMana(player: Player, amount: Double, reason: String): Boolean
+
+    /**
+     * 消耗玩家法力值（带消耗原因）
+     *
+     * @param player 目标玩家
+     * @param amount 消耗数量
+     * @param reason 消耗原因（如技能名称）
+     * @param showAlert 法力不足时是否显示提示（替换法力显示为"§c§l法力不足"，持续2秒）
+     * @return 是否消耗成功（法力不足时返回 false）
+     */
+    fun consumeMana(player: Player, amount: Double, reason: String, showAlert: Boolean): Boolean
+
+    /**
+     * 恢复玩家法力值
+     *
+     * @param player 目标玩家
+     * @param amount 恢复数量
+     */
+    fun restoreMana(player: Player, amount: Double)
+
+    /**
+     * 设置玩家法力值
+     *
+     * @param player 目标玩家
+     * @param amount 设置值（会被限制在 0 到 maxMana 之间）
+     */
+    fun setMana(player: Player, amount: Double)
 }

@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class CacheService  : PlayerStatDao {
     private val playerCache = ConcurrentHashMap<UUID, PlayerStat>()
+    private val manaCache = ConcurrentHashMap<UUID, Double>()
 
     override fun getPlayerStats(uuid: UUID) = playerCache[uuid]
 
@@ -16,9 +17,19 @@ class CacheService  : PlayerStatDao {
 
     override fun removePlayer(uuid: UUID) {
         playerCache.remove(uuid)
+        manaCache.remove(uuid)
     }
 
     override fun clearCache() {
         playerCache.clear()
+        manaCache.clear()
+    }
+
+    fun getMana(uuid: UUID): Double {
+        return manaCache.getOrDefault(uuid, 100.0)
+    }
+
+    fun setMana(uuid: UUID, amount: Double) {
+        manaCache[uuid] = amount
     }
 }

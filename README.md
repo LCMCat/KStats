@@ -3,8 +3,7 @@ KStats
 *A Modern and Lightweight Player Stat Management Plugin for Minecraft Servers*
 
 ## 📊 Features
-- **Core Player Stats**: Health, Defense, Strength, Speed, Crit Chance, Crit Damage, Base Damage, Damage Multiplier, Mending
-- ⚠️ *Wisdom stat interaction is currently in development*
+- **Core Player Stats**: Health, Defense, Strength, Speed, Crit Chance, Crit Damage, Base Damage, Damage Multiplier,Mana Regen, Mending
 
 ## 🧮 Stat Calculation Architecture
 Player attributes are computed using a centralized **Total Aggregator** system:

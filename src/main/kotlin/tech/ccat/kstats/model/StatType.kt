@@ -10,5 +10,6 @@ enum class StatType {
     WISDOM,
     BASE_DAMAGE,
     DAMAGE_MULTIPLIER,
-    HEALING
+    HEALING,
+    MANA_REGEN
 }
