@@ -1,156 +1,50 @@
 package tech.ccat.kstats.api
 
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import tech.ccat.kstats.model.PlayerStat
+import tech.ccat.kstats.model.BaseEntityStat
 import tech.ccat.kstats.model.StatType
 import java.util.concurrent.CopyOnWriteArrayList
 
-/**
- * KStats插件的主要API接口，提供访问玩家状态数据和注册状态提供者的能力
- *
- * 其他插件可以通过[org.bukkit.plugin.ServicesManager]获取此接口的实例
- *
- * 使用示例：
- * val api = Bukkit.getServicesManager().getRegistration(KStatsAPI::class.java)?.provider
- * api?.registerProvider(myStatProvider)
- * ```
- */
 interface KStatsAPI {
 
-    /**
-     * 获取玩家的完整状态信息
-     *
-     * @param player 目标玩家
-     * @return 包含所有状态值的PlayerStat对象
-     */
-    fun getAllStats(player: Player): PlayerStat
+    fun getAllStats(entity: LivingEntity): BaseEntityStat
 
-    /**
-     * 获取玩家的特定状态值
-     *
-     * @param player 目标玩家
-     * @param statType 要获取的状态类型
-     * @return 对应状态类型的数值
-     */
-    fun getStat(player: Player, statType: StatType): Double
+    fun getStat(entity: LivingEntity, statType: StatType): Double
 
-    /**
-     * 注册状态提供者
-     *
-     * 所有注册的提供者会被综合计算玩家属性
-     *
-     * @param provider 要注册的状态提供者实例
-     */
     fun registerProvider(provider: StatProvider)
 
-    /**
-     * 取消注册状态提供者
-     *
-     * @param provider 要取消注册的状态提供者实例
-     */
     fun unregisterProvider(provider: StatProvider)
 
-    /**
-     * 强制更新玩家的状态数据
-     *
-     * @param player 要更新的玩家
-     */
     fun forceUpdate(player: Player)
 
-    /**
-     * 强制更新所有在线玩家的状态数据
-     */
     fun forceUpdateAll()
 
-    /**
-     * 获取所有已注册的Provider
-     */
     fun getRegisteredProviders(): CopyOnWriteArrayList<StatProvider>?
 
-    /**
-     * 请求更新玩家状态数据（带防抖）
-     *
-     * 短时间内的多次调用会被合并为一次实际更新，
-     * 适用于高频触发场景（如物品切换）
-     *
-     * @param player 要更新的玩家
-     */
     fun requestUpdate(player: Player)
 
-    /**
-     * 请求更新所有在线玩家的状态数据（带防抖）
-     */
     fun requestUpdateAll()
 
-    /**
-     * 获取玩家当前法力值
-     *
-     * @param player 目标玩家
-     * @return 当前法力值
-     */
     fun getMana(player: Player): Double
 
-    /**
-     * 获取玩家最大法力值（即 wisdom 属性）
-     *
-     * @param player 目标玩家
-     * @return 最大法力值
-     */
     fun getMaxMana(player: Player): Double
 
-    /**
-     * 消耗玩家法力值
-     *
-     * @param player 目标玩家
-     * @param amount 消耗数量
-     * @return 是否消耗成功（法力不足时返回 false）
-     */
     fun consumeMana(player: Player, amount: Double): Boolean
 
-    /**
-     * 消耗玩家法力值
-     *
-     * @param player 目标玩家
-     * @param amount 消耗数量
-     * @param showAlert 法力不足时是否显示提示（替换法力显示为"§c§l法力不足"，持续2秒）
-     * @return 是否消耗成功（法力不足时返回 false）
-     */
     fun consumeMana(player: Player, amount: Double, showAlert: Boolean): Boolean
 
-    /**
-     * 消耗玩家法力值（带消耗原因，默认显示消耗信息）
-     *
-     * @param player 目标玩家
-     * @param amount 消耗数量
-     * @param reason 消耗原因（如技能名称）
-     * @return 是否消耗成功（法力不足时返回 false）
-     */
     fun consumeMana(player: Player, amount: Double, reason: String): Boolean
 
-    /**
-     * 消耗玩家法力值（带消耗原因）
-     *
-     * @param player 目标玩家
-     * @param amount 消耗数量
-     * @param reason 消耗原因（如技能名称）
-     * @param showAlert 法力不足时是否显示提示（替换法力显示为"§c§l法力不足"，持续2秒）
-     * @return 是否消耗成功（法力不足时返回 false）
-     */
     fun consumeMana(player: Player, amount: Double, reason: String, showAlert: Boolean): Boolean
 
-    /**
-     * 恢复玩家法力值
-     *
-     * @param player 目标玩家
-     * @param amount 恢复数量
-     */
     fun restoreMana(player: Player, amount: Double)
 
-    /**
-     * 设置玩家法力值
-     *
-     * @param player 目标玩家
-     * @param amount 设置值（会被限制在 0 到 maxMana 之间）
-     */
     fun setMana(player: Player, amount: Double)
+
+    fun setEntityProvider(provider: EntityStatProvider)
+
+    fun clearEntityProvider()
+
+    fun getEntityProvider(): EntityStatProvider?
 }

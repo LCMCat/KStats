@@ -2,10 +2,12 @@ package tech.ccat.kstats
 
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
 import tech.ccat.hsubtitle.api.HSubTitleAPI
+import tech.ccat.kstats.api.EntityStatProvider
 import tech.ccat.kstats.api.KStatsAPI
 import tech.ccat.kstats.api.StatProvider
 import tech.ccat.kstats.command.CommandManager
@@ -14,8 +16,10 @@ import tech.ccat.kstats.command.ShowCommand
 import tech.ccat.kstats.config.ConfigManager
 import tech.ccat.kstats.event.ManaConsumptionEvent
 import tech.ccat.kstats.listener.*
+import tech.ccat.kstats.model.BaseEntityStat
 import tech.ccat.kstats.model.StatType
 import tech.ccat.kstats.service.CacheService
+import tech.ccat.kstats.service.EntityStatManager
 import tech.ccat.kstats.service.StatManager
 import tech.ccat.kstats.subtitle.DefenseProvider
 import tech.ccat.kstats.subtitle.HealthProvider
@@ -24,16 +28,14 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class KStats : JavaPlugin(), KStatsAPI {
 
-    // 依赖注入
     internal lateinit var configManager: ConfigManager
     internal lateinit var cacheService: CacheService
     internal lateinit var statManager: StatManager
+    internal lateinit var entityStatManager: EntityStatManager
     internal lateinit var commandManager: CommandManager
 
-    //外置API
     private lateinit var subTitleApi: HSubTitleAPI
 
-    //一个监听器
     private lateinit var healingListener: HealingListener
 
     companion object {
@@ -45,32 +47,27 @@ class KStats : JavaPlugin(), KStatsAPI {
         instance = this
         saveDefaultConfig()
 
-        // 初始化核心模块
         configManager = ConfigManager().apply { setup() }
         cacheService = CacheService()
         statManager = StatManager(cacheService, configManager).apply {
             setDebounceDelay(configManager.statConfig.getDebounceDelay())
         }
+        entityStatManager = EntityStatManager()
 
-        // 注册事件监听器
         registerListeners()
 
-        // 初始化命令系统
         commandManager = CommandManager().apply {
             registerCommand(ShowCommand())
             registerCommand(ReloadCommand())
         }
         this.getCommand("kstats")?.setExecutor(commandManager)
 
-        // 关闭原版恢复机制
         Bukkit.getWorlds().forEach { world ->
             world.setGameRule(GameRule.NATURAL_REGENERATION, false)
         }
 
-        //注册Provider
         registerSubTitles()
 
-        // 将自身注册为服务提供者 (Bukkit方式)
         server.servicesManager.register(
             KStatsAPI::class.java,
             this,
@@ -78,27 +75,21 @@ class KStats : JavaPlugin(), KStatsAPI {
             ServicePriority.Normal
         )
 
-        logger.info("KStats已启用。API版本: ${getDescription().version}")
+        logger.info("KStats已启用。API版本: ${pluginMeta.version}")
 
         if(!Bukkit.getOnlinePlayers().isEmpty()){
             midInitPlayerStat()
         }
     }
 
-    /**
-     * 插件禁用时调用
-     */
     override fun onDisable() {
-        // 停止所有任务
         statManager.unregisterAllProviders()
+        entityStatManager.clearProvider()
 
-        // 清理缓存
         cacheService.clearCache()
 
-        // 取消服务注册
         server.servicesManager.unregister(this)
 
-        //卸载Provider
         if (::subTitleApi.isInitialized) {
             subTitleApi.unregisterProvider(HealthProvider)
             subTitleApi.unregisterProvider(DefenseProvider)
@@ -115,7 +106,7 @@ class KStats : JavaPlugin(), KStatsAPI {
             subTitleApi.registerProvider(HealthProvider)
             subTitleApi.registerProvider(DefenseProvider)
             subTitleApi.registerProvider(ManaProvider)
-            logger.info("已注册到 HSubTitle v${registration.plugin.getDescription().version}")
+            logger.info("已注册到 HSubTitle v${registration.plugin.pluginMeta.version}")
         } else {
             logger.warning("HSubTitle API 未找到，动作条功能将不可用")
         }
@@ -126,7 +117,7 @@ class KStats : JavaPlugin(), KStatsAPI {
 
         healingListener = HealingListener()
 
-        pm.registerEvents(DamageListener(), this)
+        pm.registerEvents(EntityDamageListener(), this)
         pm.registerEvents(CriticalHitListener(), this)
         pm.registerEvents(SpeedListener(), this)
         pm.registerEvents(healingListener, this)
@@ -134,7 +125,6 @@ class KStats : JavaPlugin(), KStatsAPI {
         pm.registerEvents(PlayerLoginListener(), this)
     }
 
-    //如果插件在服务器运行中被Bukkit的插件管理器重载，则使用次方法加载未被监听器加载的玩家数据
     private fun midInitPlayerStat(){
         Bukkit.getOnlinePlayers().forEach {
             statManager.initPlayerStats(it)
@@ -144,11 +134,31 @@ class KStats : JavaPlugin(), KStatsAPI {
         }
     }
 
-    // ============ KStatsAPI 实现 ============
+    override fun getAllStats(entity: LivingEntity): BaseEntityStat {
+        return if (entity is Player) {
+            statManager.getAllStats(entity)
+        } else {
+            entityStatManager.getAllStats(entity)
+        }
+    }
 
-    override fun getAllStats(player: Player) = statManager.getAllStats(player)
-
-    override fun getStat(player: Player, statType: StatType) = statManager.getStat(player, statType)
+    override fun getStat(entity: LivingEntity, statType: StatType): Double {
+        if (statType.isBaseStat()) {
+            return if (entity is Player) {
+                statManager.getAllStats(entity).getStatValue(statType)
+            } else {
+                entityStatManager.getStat(entity, statType)
+            }
+        }
+        if (statType.isPlayerOnly()) {
+            return if (entity is Player) {
+                statManager.getAllStats(entity).getStatValue(statType)
+            } else {
+                0.0
+            }
+        }
+        return 0.0
+    }
 
     override fun registerProvider(provider: StatProvider) {
         statManager.registerProvider(provider)
@@ -229,5 +239,17 @@ class KStats : JavaPlugin(), KStatsAPI {
         val maxMana = getMaxMana(player)
         val clampedAmount = amount.coerceIn(0.0, maxMana)
         cacheService.setMana(player.uniqueId, clampedAmount)
+    }
+
+    override fun setEntityProvider(provider: EntityStatProvider) {
+        entityStatManager.setProvider(provider)
+    }
+
+    override fun clearEntityProvider() {
+        entityStatManager.clearProvider()
+    }
+
+    override fun getEntityProvider(): EntityStatProvider? {
+        return entityStatManager.getProvider()
     }
 }
