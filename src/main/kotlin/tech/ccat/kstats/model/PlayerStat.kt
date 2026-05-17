@@ -61,16 +61,16 @@ data class PlayerStat(
     }
 
     fun addAllStats(other: PlayerStat) {
-        health = this.health + other.health
-        defense = this.defense + other.defense
-        strength = this.strength + other.strength
-        speed = this.speed + other.speed
-        critChance = this.critChance + other.critChance
-        critDamage = this.critDamage + other.critDamage
-        wisdom = this.wisdom + other.wisdom
-        baseDamage = this.baseDamage + other.baseDamage
-        damageMultiplier = this.damageMultiplier + other.damageMultiplier
-        healing = this.healing + other.healing
-        manaRegen = this.manaRegen + other.manaRegen
+        health += other.health
+        defense += other.defense
+        strength += other.strength
+        speed += other.speed
+        critChance += other.critChance
+        critDamage += other.critDamage
+        wisdom += other.wisdom
+        baseDamage += other.baseDamage
+        damageMultiplier += other.damageMultiplier
+        healing += other.healing
+        manaRegen += other.manaRegen
     }
 }

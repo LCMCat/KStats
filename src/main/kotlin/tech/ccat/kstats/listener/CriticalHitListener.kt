@@ -1,6 +1,7 @@
 package tech.ccat.kstats.listener
 
 import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -11,7 +12,11 @@ import tech.ccat.kstats.util.MessageFormatter
 class CriticalHitListener : Listener {
     @EventHandler
     fun onAttack(event: EntityDamageByEntityEvent) {
-        val damager = event.damager as? Player ?: return
+        val damager = when (event.damager) {
+            is Player -> event.damager as Player
+            is Projectile -> (event.damager as Projectile).shooter as? Player ?: return
+            else -> return
+        }
         val stats = KStats.instance.statManager.getAllStats(damager)
 
         if (CombatUtil.isCritical(stats.critChance)) {

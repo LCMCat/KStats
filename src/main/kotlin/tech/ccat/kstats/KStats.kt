@@ -181,7 +181,8 @@ class KStats : JavaPlugin(), KStatsAPI {
     }
 
     override fun getMana(player: Player): Double {
-        return cacheService.getMana(player.uniqueId)
+        val maxMana = getMaxMana(player)
+        return cacheService.getMana(player.uniqueId).coerceAtMost(maxMana)
     }
 
     override fun getMaxMana(player: Player): Double {

@@ -4,10 +4,9 @@ import org.bukkit.entity.Player
 import tech.ccat.hsubtitle.api.TextProvider
 import tech.ccat.hsubtitle.model.Info
 import tech.ccat.kstats.KStats
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.floor
 
 data class ManaAlert(
     val message: String,
@@ -66,18 +65,20 @@ object ManaProvider : TextProvider {
             return Info(alert, 200)
         }
 
-        val format = DecimalFormat("#.#")
-        format.roundingMode = RoundingMode.FLOOR
+        val maxMana = KStats.instance.getMaxMana(player)
+        if (maxMana < 1) {
+            return Info("", 200)
+        }
 
-        val mana = format.format(KStats.instance.getMana(player))
-        val maxMana = format.format(KStats.instance.getMaxMana(player))
+        val mana = floor(KStats.instance.getMana(player)).toInt()
+        val maxManaInt = floor(maxMana).toInt()
 
         val consumption = getConsumption(player.uniqueId)
         if (consumption != null) {
-            val amountStr = format.format(consumption.amount)
-            return Info("§b✦智慧 ${mana}/${maxMana} (-${amountStr} ${consumption.reason})§r", 200)
+            val amountInt = floor(consumption.amount).toInt()
+            return Info("§b✦智慧 ${mana}/${maxManaInt} (-${amountInt} ${consumption.reason})§r", 200)
         }
 
-        return Info("§b✦智慧 ${mana}/${maxMana}§r", 200)
+        return Info("§b✦智慧 ${mana}/${maxManaInt}§r", 200)
     }
 }

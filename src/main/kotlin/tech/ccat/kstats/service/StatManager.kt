@@ -76,7 +76,6 @@ class StatManager(
 
         // 计算总属性
         val totalStats = summationEngine.calculateStats(player, baseStats)
-
         // 更新缓存并触发事件
         cacheService.savePlayerStats(player.uniqueId, totalStats)
         Bukkit.getPluginManager().callEvent(StatUpdateEvent(player, totalStats))
