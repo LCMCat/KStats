@@ -47,4 +47,14 @@ interface KStatsAPI {
     fun clearEntityProvider()
 
     fun getEntityProvider(): EntityStatProvider?
+
+    fun getRealHealth(player: Player): Double
+
+    fun setRealHealth(player: Player, health: Double)
+
+    fun getMaxHealth(player: Player): Double
+
+    fun damagePlayer(player: Player, amount: Double)
+
+    fun healPlayer(player: Player, amount: Double)
 }

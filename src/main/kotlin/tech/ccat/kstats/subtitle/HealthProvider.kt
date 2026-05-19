@@ -4,7 +4,6 @@ import org.bukkit.entity.Player
 import tech.ccat.hsubtitle.api.TextProvider
 import tech.ccat.hsubtitle.model.Info
 import tech.ccat.kstats.KStats
-import tech.ccat.kstats.model.StatType
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
@@ -13,8 +12,8 @@ object HealthProvider : TextProvider {
         val format = DecimalFormat("#.#")
         format.roundingMode = RoundingMode.FLOOR
 
-        val health = format.format(player.health)
-        val maxHealth = format.format(KStats.instance.getStat(player, StatType.HEALTH))
+        val health = format.format(KStats.instance.getRealHealth(player))
+        val maxHealth = format.format(KStats.instance.getMaxHealth(player))
 
         return Info("§c❤生命 ${health}/${maxHealth}§r", 1000)
     }

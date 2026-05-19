@@ -1,27 +1,24 @@
 package tech.ccat.kstats.util
 
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Projectile
-import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.entity.Player
 import tech.ccat.kstats.KStats
 
 object CombatEngine {
-    fun handleDamage(event: EntityDamageByEntityEvent) {
-        val attacker: LivingEntity = when (event.damager) {
-            is Projectile -> (event.damager as Projectile).shooter as? LivingEntity ?: return
-            is LivingEntity -> event.damager as LivingEntity
-            else -> return
-        }
-        val defender = event.entity as? LivingEntity ?: return
-
+    fun calculateFinalDamage(attacker: LivingEntity, defender: LivingEntity, baseDamage: Double): Double {
         val attackerStats = KStats.instance.getAllStats(attacker)
         val defenderStats = KStats.instance.getAllStats(defender)
 
-        val damage = attackerStats.baseDamage * (1 + attackerStats.strength / 100)
+        var damage = baseDamage * (1 + attackerStats.strength / 100)
+
+        if (attacker is Player) {
+            val playerStat = KStats.instance.statManager.getAllStats(attacker)
+            damage *= playerStat.damageMultiplier
+        }
 
         val defense = defenderStats.defense
-        val finalDamage = damage * (1 - defense / (defense + 100))
+        damage *= (1 - defense / (defense + 100))
 
-        event.damage = finalDamage
+        return damage
     }
 }

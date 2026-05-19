@@ -11,7 +11,7 @@ import tech.ccat.kstats.util.CombatUtil
 import tech.ccat.kstats.util.MessageFormatter
 
 class CriticalHitListener : Listener {
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun onAttack(event: EntityDamageByEntityEvent) {
         val damager: Player = when (event.damager) {
             is Player -> event.damager as Player
