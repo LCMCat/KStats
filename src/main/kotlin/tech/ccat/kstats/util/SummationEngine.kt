@@ -1,19 +1,14 @@
-package tech.ccat.kstats.service
+package tech.ccat.kstats.util
 
 import org.bukkit.entity.Player
 import tech.ccat.kstats.api.StatProvider
 import tech.ccat.kstats.model.PlayerStat
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SummationEngine (
-    val providers: CopyOnWriteArrayList<StatProvider>
-){
-
-    fun calculateStats(player: Player, baseStats: PlayerStat): PlayerStat {
-        // 创建基础属性副本
+object SummationEngine {
+    fun calculateStats(providers: CopyOnWriteArrayList<StatProvider>, player: Player, baseStats: PlayerStat): PlayerStat {
         val result = baseStats.copy()
 
-        // 遍历所有属性提供器进行加和
         providers.forEach { provider ->
             val provided = provider.provideStats(player)
             result.addAllStats(provided)

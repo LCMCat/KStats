@@ -8,6 +8,7 @@ import tech.ccat.kstats.config.ConfigManager
 import tech.ccat.kstats.event.StatUpdateEvent
 import tech.ccat.kstats.model.PlayerStat
 import tech.ccat.kstats.model.StatType
+import tech.ccat.kstats.util.SummationEngine
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -20,7 +21,6 @@ class StatManager(
     private val logger = Bukkit.getLogger()
 
     private val providers = CopyOnWriteArrayList<StatProvider>()
-    private val summationEngine: SummationEngine = SummationEngine(providers)
 
     private val pendingUpdates = ConcurrentHashMap<UUID, Long>()
     private var debounceDelay: Long = 50L
@@ -75,7 +75,7 @@ class StatManager(
         val baseStats = configManager.statConfig.getDefaultStats()
 
         // 计算总属性
-        val totalStats = summationEngine.calculateStats(player, baseStats)
+        val totalStats = SummationEngine.calculateStats(providers, player, baseStats)
         // 更新缓存并触发事件
         cacheService.savePlayerStats(player.uniqueId, totalStats)
         Bukkit.getPluginManager().callEvent(StatUpdateEvent(player, totalStats))

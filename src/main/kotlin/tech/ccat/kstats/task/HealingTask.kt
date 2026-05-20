@@ -21,7 +21,7 @@ class HealingTask(private val player: Player) : BukkitRunnable() {
 
         Bukkit.getScheduler().runTask(plugin, Runnable {
             if (player.isOnline) {
-                plugin.healthManager.heal(player, healingAmount)
+                plugin.cacheService.heal(player, healingAmount)
             }
         })
     }

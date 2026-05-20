@@ -2,7 +2,6 @@ package tech.ccat.kstats
 
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
-import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -22,7 +21,6 @@ import tech.ccat.kstats.model.BaseEntityStat
 import tech.ccat.kstats.model.StatType
 import tech.ccat.kstats.service.CacheService
 import tech.ccat.kstats.service.EntityStatManager
-import tech.ccat.kstats.service.HealthManager
 import tech.ccat.kstats.service.StatManager
 import tech.ccat.kstats.subtitle.DefenseProvider
 import tech.ccat.kstats.subtitle.HealthProvider
@@ -36,7 +34,6 @@ class KStats : JavaPlugin(), KStatsAPI {
     internal lateinit var statManager: StatManager
     internal lateinit var entityStatManager: EntityStatManager
     internal lateinit var commandManager: CommandManager
-    internal lateinit var healthManager: HealthManager
 
     private lateinit var subTitleApi: HSubTitleAPI
 
@@ -57,7 +54,6 @@ class KStats : JavaPlugin(), KStatsAPI {
             setDebounceDelay(configManager.statConfig.getDebounceDelay())
         }
         entityStatManager = EntityStatManager()
-        healthManager = HealthManager()
 
         registerListeners()
 
@@ -92,7 +88,6 @@ class KStats : JavaPlugin(), KStatsAPI {
         entityStatManager.clearProvider()
 
         cacheService.clearCache()
-        healthManager.clear()
 
         server.servicesManager.unregister(this)
 
@@ -135,9 +130,9 @@ class KStats : JavaPlugin(), KStatsAPI {
     private fun midInitPlayerStat(){
         Bukkit.getOnlinePlayers().forEach {
             statManager.initPlayerStats(it)
-            it.getAttribute(Attribute.MAX_HEALTH)?.baseValue = HealthManager.DISPLAY_MAX_HEALTH
-            healthManager.initFromDisplay(it)
+            it.getAttribute(Attribute.MAX_HEALTH)?.baseValue = CacheService.DISPLAY_MAX_HEALTH
             statManager.updateStats(it)
+            cacheService.initFromDisplay(it)
 
             healingListener.addPlayerToTask(it)
         }
@@ -263,22 +258,22 @@ class KStats : JavaPlugin(), KStatsAPI {
     }
 
     override fun getRealHealth(player: Player): Double {
-        return healthManager.getRealHealth(player)
+        return cacheService.getRealHealth(player)
     }
 
     override fun setRealHealth(player: Player, health: Double) {
-        healthManager.setRealHealth(player, health)
+        cacheService.setRealHealth(player, health)
     }
 
     override fun getMaxHealth(player: Player): Double {
-        return healthManager.getMaxHealth(player)
+        return cacheService.getMaxHealth(player)
     }
 
     override fun damagePlayer(player: Player, amount: Double) {
-        healthManager.damage(player, amount)
+        cacheService.damage(player, amount)
     }
 
     override fun healPlayer(player: Player, amount: Double) {
-        healthManager.heal(player, amount)
+        cacheService.heal(player, amount)
     }
 }

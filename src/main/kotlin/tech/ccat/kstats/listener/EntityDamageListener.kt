@@ -25,8 +25,8 @@ class EntityDamageListener : Listener {
 
         if (defender is Player) {
             val plugin = KStats.instance
-            val maxHealth = plugin.healthManager.getMaxHealth(defender)
-            val displayDamage = plugin.healthManager.toDisplayHealth(finalDamage, maxHealth)
+            val maxHealth = plugin.cacheService.getMaxHealth(defender)
+            val displayDamage = plugin.cacheService.toDisplayHealth(finalDamage, maxHealth)
             event.damage = displayDamage
         } else {
             event.damage = finalDamage
@@ -36,6 +36,6 @@ class EntityDamageListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onDamageMonitor(event: EntityDamageEvent) {
         val player = event.entity as? Player ?: return
-        KStats.instance.healthManager.syncDisplay(player)
+        KStats.instance.cacheService.syncDisplay(player)
     }
 }

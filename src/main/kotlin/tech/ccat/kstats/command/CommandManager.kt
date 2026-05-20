@@ -16,7 +16,14 @@ class CommandManager() : TabExecutor {
     override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
 
         if(args.isEmpty()){
-            sendSenderHelp(sender)
+            if (sender is Player) {
+                val showCommand = commands["show"]
+                if (showCommand != null) {
+                    return showCommand.execute(sender, arrayOf("show"))
+                }
+            } else {
+                sendSenderHelp(sender)
+            }
             return true
         }
 

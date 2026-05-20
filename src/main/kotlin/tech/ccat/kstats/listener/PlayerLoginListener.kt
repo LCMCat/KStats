@@ -6,7 +6,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import tech.ccat.kstats.KStats
-import tech.ccat.kstats.service.HealthManager
+import tech.ccat.kstats.service.CacheService
 
 class PlayerLoginListener : Listener {
     private val plugin = KStats.instance
@@ -16,16 +16,15 @@ class PlayerLoginListener : Listener {
         val player = event.player
         plugin.statManager.initPlayerStats(player)
 
-        player.getAttribute(Attribute.MAX_HEALTH)?.baseValue = HealthManager.DISPLAY_MAX_HEALTH
-
-        plugin.healthManager.initFromDisplay(player)
+        player.getAttribute(Attribute.MAX_HEALTH)?.baseValue = CacheService.DISPLAY_MAX_HEALTH
 
         plugin.statManager.updateStats(player)
+
+        plugin.cacheService.initFromDisplay(player)
     }
 
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        plugin.healthManager.removePlayer(event.player.uniqueId)
         plugin.cacheService.removePlayer(event.player.uniqueId)
     }
 }

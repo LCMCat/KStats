@@ -8,17 +8,6 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.floor
 
-data class ManaAlert(
-    val message: String,
-    val expireTime: Long
-)
-
-data class ManaConsumption(
-    val amount: Double,
-    val reason: String,
-    val expireTime: Long
-)
-
 object ManaProvider : TextProvider {
     private val alertCache = ConcurrentHashMap<UUID, ManaAlert>()
     private val consumptionCache = ConcurrentHashMap<UUID, ManaConsumption>()
