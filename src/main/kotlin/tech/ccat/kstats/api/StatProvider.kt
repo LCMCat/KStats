@@ -13,7 +13,7 @@ import tech.ccat.kstats.model.PlayerStat
  * 示例实现：
  * class MyStatProvider : StatProvider {
  *     override fun provideStats(player: Player): PlayerStat {
- *         return PlayerStat().apply {
+ *         return StatFactory.emptyPlayerStat().apply {
  *             strength = if(player.isSprinting) 10.0 else 0.0
  *         }
  *     }
