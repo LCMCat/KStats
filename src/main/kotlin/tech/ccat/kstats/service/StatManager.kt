@@ -87,7 +87,8 @@ class StatManager(
      * @return PlayerStat对象包含所有状态数据
      */
     fun getAllStats(player: Player): PlayerStat {
-        return cacheService.getPlayerStats(player.uniqueId) ?: PlayerStat()
+        return cacheService.getPlayerStats(player.uniqueId) 
+            ?: configManager.statConfig.getDefaultStats()
     }
 
     /**

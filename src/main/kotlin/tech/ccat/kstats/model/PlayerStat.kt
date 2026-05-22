@@ -1,16 +1,16 @@
 package tech.ccat.kstats.model
 
 class PlayerStat(
-    health: Double = 20.0,
+    health: Double = 0.0,
     defense: Double = 0.0,
     strength: Double = 0.0,
-    speed: Double = 100.0,
-    baseDamage: Double = 1.0,
-    var critChance: Double = 30.0,
-    var critDamage: Double = 50.0,
-    var wisdom: Double = 100.0,
-    var damageMultiplier: Double = 1.0,
-    var healing: Double = 100.0,
+    speed: Double = 0.0,
+    baseDamage: Double = 0.0,
+    var critChance: Double = 0.0,
+    var critDamage: Double = 0.0,
+    var wisdom: Double = 0.0,
+    var damageMultiplier: Double = 0.0,
+    var healing: Double = 0.0,
     var manaRegen: Double = 0.0
 ) : BaseEntityStat(health, defense, strength, speed, baseDamage) {
 

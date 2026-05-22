@@ -10,10 +10,12 @@ import tech.ccat.kstats.model.PlayerStat
  * 1. 在插件启用时注册到KStatsAPI
  * 2. 在插件禁用时取消注册
  *
+ * 注意：PlayerStat() 默认所有属性为 0，Provider 只需设置需要贡献的增量值。
+ *
  * 示例实现：
  * class MyStatProvider : StatProvider {
  *     override fun provideStats(player: Player): PlayerStat {
- *         return StatFactory.emptyPlayerStat().apply {
+ *         return PlayerStat().apply {
  *             strength = if(player.isSprinting) 10.0 else 0.0
  *         }
  *     }
