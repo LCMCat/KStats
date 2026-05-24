@@ -1,5 +1,6 @@
 package tech.ccat.kstats.listener
 
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -14,6 +15,8 @@ import tech.ccat.kstats.util.CombatEngine
 class EntityDamageListener : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onEntityDamage(event: EntityDamageByEntityEvent) {
+        val api = KStats.instance
+
         val attacker: LivingEntity = when (event.damager) {
             is Projectile -> (event.damager as Projectile).shooter as? LivingEntity ?: return
             is LivingEntity -> event.damager as LivingEntity
@@ -24,18 +27,37 @@ class EntityDamageListener : Listener {
         val finalDamage = CombatEngine.calculateFinalDamage(attacker, defender, event.damage)
 
         if (defender is Player) {
-            val plugin = KStats.instance
-            val maxHealth = plugin.cacheService.getMaxHealth(defender)
-            val displayDamage = plugin.cacheService.toDisplayHealth(finalDamage, maxHealth)
-            event.damage = displayDamage
+            event.damage = 0.0
+
+            val killer: Entity = when (event.damager) {
+                is Projectile -> event.damager as Projectile
+                else -> attacker
+            }
+            api.damagePlayer(defender, finalDamage, event.cause, killer)
         } else {
             event.damage = finalDamage
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onDamageMonitor(event: EntityDamageEvent) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun onGenericDamage(event: EntityDamageEvent) {
+        if (event is EntityDamageByEntityEvent) return
+
         val player = event.entity as? Player ?: return
-        KStats.instance.cacheService.syncDisplay(player)
+
+        val api = KStats.instance
+
+        val finalDamage = when (event.cause) {
+            EntityDamageEvent.DamageCause.FALL,
+            EntityDamageEvent.DamageCause.FLY_INTO_WALL -> {
+                val defenderStats = api.getAllStats(player)
+                val defense = defenderStats.defense
+                event.damage * (1 - defense / (defense + 100))
+            }
+            else -> event.damage
+        }
+
+        event.damage = 0.0
+        api.damagePlayer(player, finalDamage, event.cause, null)
     }
 }

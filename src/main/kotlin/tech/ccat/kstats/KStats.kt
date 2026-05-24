@@ -3,8 +3,10 @@ package tech.ccat.kstats
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.attribute.Attribute
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
 import tech.ccat.hsubtitle.api.HSubTitleAPI
@@ -125,6 +127,7 @@ class KStats : JavaPlugin(), KStatsAPI {
         pm.registerEvents(healingListener, this)
         pm.registerEvents(StatUpdateListener(), this)
         pm.registerEvents(PlayerLoginListener(), this)
+        pm.registerEvents(PlayerDeathListener(), this)
     }
 
     private fun midInitPlayerStat(){
@@ -257,6 +260,8 @@ class KStats : JavaPlugin(), KStatsAPI {
         return entityStatManager.getProvider()
     }
 
+    // ==================== Health API ====================
+
     override fun getRealHealth(player: Player): Double {
         return cacheService.getRealHealth(player)
     }
@@ -273,7 +278,27 @@ class KStats : JavaPlugin(), KStatsAPI {
         cacheService.damage(player, amount)
     }
 
+    override fun damagePlayer(player: Player, amount: Double, cause: EntityDamageEvent.DamageCause?, killer: Entity?) {
+        cacheService.damage(player, amount, cause, killer)
+    }
+
     override fun healPlayer(player: Player, amount: Double) {
         cacheService.heal(player, amount)
+    }
+
+    override fun healPlayer(player: Player) {
+        cacheService.heal(player)
+    }
+
+    override fun syncDisplay(player: Player) {
+        cacheService.syncDisplay(player)
+    }
+
+    override fun toDisplayHealth(realHealth: Double, maxHealth: Double): Double {
+        return cacheService.toDisplayHealth(realHealth, maxHealth)
+    }
+
+    override fun toRealHealth(displayHealth: Double, maxHealth: Double): Double {
+        return cacheService.toRealHealth(displayHealth, maxHealth)
     }
 }

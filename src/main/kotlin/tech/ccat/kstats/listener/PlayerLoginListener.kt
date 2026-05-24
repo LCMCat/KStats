@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerRespawnEvent
 import tech.ccat.kstats.KStats
 import tech.ccat.kstats.service.CacheService
 
@@ -26,5 +27,11 @@ class PlayerLoginListener : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         plugin.cacheService.removePlayer(event.player.uniqueId)
+    }
+
+    @EventHandler
+    fun onPlayerRespawn(event: PlayerRespawnEvent){
+        val player = event.player
+        plugin.cacheService.heal(player)
     }
 }

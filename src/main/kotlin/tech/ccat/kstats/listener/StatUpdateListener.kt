@@ -12,6 +12,6 @@ class StatUpdateListener : Listener {
     fun onStatUpdate(event: StatUpdateEvent) {
         val player = event.player
         player.getAttribute(Attribute.MAX_HEALTH)?.baseValue = CacheService.DISPLAY_MAX_HEALTH
-        KStats.instance.cacheService.syncDisplay(player)
+        KStats.instance.syncDisplay(player)
     }
 }

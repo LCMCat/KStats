@@ -1,7 +1,9 @@
 package tech.ccat.kstats.api
 
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent
 import tech.ccat.kstats.model.BaseEntityStat
 import tech.ccat.kstats.model.StatType
 import java.util.concurrent.CopyOnWriteArrayList
@@ -169,6 +171,8 @@ interface KStatsAPI {
      */
     fun getEntityProvider(): EntityStatProvider?
 
+    // ==================== Health API ====================
+
     /**
      * 获取玩家真实生命值
      *
@@ -202,10 +206,52 @@ interface KStatsAPI {
     fun damagePlayer(player: Player, amount: Double)
 
     /**
+     * 对玩家造成伤害（带死亡原因和击杀者）
+     *
+     * @param player 目标玩家
+     * @param amount 伤害量
+     * @param cause 伤害原因
+     * @param killer 击杀者
+     */
+    fun damagePlayer(player: Player, amount: Double, cause: EntityDamageEvent.DamageCause?, killer: Entity?)
+
+    /**
      * 治疗玩家
      *
      * @param player 目标玩家
      * @param amount 治疗量
      */
     fun healPlayer(player: Player, amount: Double)
+
+    /**
+     * 治疗玩家至满血
+     *
+     * @param player 目标玩家
+     */
+    fun healPlayer(player: Player)
+
+    /**
+     * 同步玩家生命值显示
+     *
+     * @param player 目标玩家
+     */
+    fun syncDisplay(player: Player)
+
+    /**
+     * 将真实生命值转换为显示生命值
+     *
+     * @param realHealth 真实生命值
+     * @param maxHealth 最大生命值
+     * @return 显示生命值（0-20）
+     */
+    fun toDisplayHealth(realHealth: Double, maxHealth: Double): Double
+
+    /**
+     * 将显示生命值转换为真实生命值
+     *
+     * @param displayHealth 显示生命值（0-20）
+     * @param maxHealth 最大生命值
+     * @return 真实生命值
+     */
+    fun toRealHealth(displayHealth: Double, maxHealth: Double): Double
 }

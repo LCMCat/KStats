@@ -1,8 +1,12 @@
 package tech.ccat.kstats.service
 
+import org.bukkit.Bukkit
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent
 import tech.ccat.kstats.KStats
 import tech.ccat.kstats.dao.PlayerStatDao
+import tech.ccat.kstats.event.PlayerSetDeathEvent
 import tech.ccat.kstats.model.PlayerStat
 import tech.ccat.kstats.model.StatType
 import java.util.*
@@ -40,7 +44,7 @@ class CacheService : PlayerStatDao {
     // ==================== Mana 缓存 ====================
 
     fun getMana(uuid: UUID): Double {
-        return manaCache.getOrDefault(uuid, 
+        return manaCache.getOrDefault(uuid,
             KStats.instance.configManager.statConfig.getDefaultStats().wisdom)
     }
 
@@ -63,17 +67,37 @@ class CacheService : PlayerStatDao {
         val maxHealth = getMaxHealth(player)
         val clamped = health.coerceIn(0.0, maxHealth)
         realHealthCache[player.uniqueId] = clamped
-        syncDisplayToPlayer(player)
+
+        if (clamped <= 0) {
+            val deathEvent = PlayerSetDeathEvent(player, player.location, null, null)
+            Bukkit.getPluginManager().callEvent(deathEvent)
+        } else {
+            syncDisplayToPlayer(player)
+        }
     }
 
-    fun damage(player: Player, amount: Double) {
+    fun damage(player: Player, amount: Double, cause: EntityDamageEvent.DamageCause? = null, killer: Entity? = null) {
         val current = getRealHealth(player)
-        setRealHealth(player, current - amount)
+        val newHealth = current - amount
+
+        if (newHealth <= 0) {
+            realHealthCache[player.uniqueId] = 0.0
+            val deathEvent = PlayerSetDeathEvent(player, player.location, cause, killer)
+            Bukkit.getPluginManager().callEvent(deathEvent)
+        } else {
+            setRealHealth(player, newHealth)
+        }
     }
 
     fun heal(player: Player, amount: Double) {
         val current = getRealHealth(player)
+        if (current <= 0) return
         setRealHealth(player, current + amount)
+    }
+
+    fun heal(player: Player) {
+        val maxHealth = getMaxHealth(player)
+        setRealHealth(player, maxHealth)
     }
 
     fun toDisplayHealth(realHealth: Double, maxHealth: Double): Double {
@@ -89,7 +113,7 @@ class CacheService : PlayerStatDao {
         val maxHealth = getMaxHealth(player)
         val realHealth = getRealHealth(player)
         val displayHealth = toDisplayHealth(realHealth, maxHealth)
-        player.health = displayHealth.coerceIn(0.5, DISPLAY_MAX_HEALTH)
+        player.health = displayHealth.coerceIn(0.0, DISPLAY_MAX_HEALTH)
     }
 
     fun syncDisplay(player: Player) {
@@ -108,7 +132,7 @@ class CacheService : PlayerStatDao {
         realHealthCache[uuid] = realHealth.coerceIn(0.0, maxHealth)
 
         val newDisplayHealth = toDisplayHealth(realHealth, maxHealth)
-        player.health = newDisplayHealth.coerceIn(0.5, DISPLAY_MAX_HEALTH)
+        player.health = newDisplayHealth.coerceIn(0.0, DISPLAY_MAX_HEALTH)
     }
 
     fun initFromDisplay(player: Player) {

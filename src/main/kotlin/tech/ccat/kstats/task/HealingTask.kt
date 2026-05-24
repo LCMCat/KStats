@@ -13,14 +13,14 @@ class HealingTask(private val player: Player) : BukkitRunnable() {
     }
 
     override fun run() {
-        if (!player.isOnline) return
+        if (!player.isOnline || player.isDead) return
 
         val stats = plugin.statManager.getAllStats(player)
         val maxHealth = stats.health
         val healingAmount = (maxHealth / 100 + 1.5) * (stats.healing / 100)
 
         Bukkit.getScheduler().runTask(plugin, Runnable {
-            if (player.isOnline) {
+            if (player.isOnline && !player.isDead) {
                 plugin.cacheService.heal(player, healingAmount)
             }
         })
