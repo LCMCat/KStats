@@ -18,7 +18,7 @@ class StatManager(
     private val configManager: ConfigManager
 ) {
 
-    private val logger = Bukkit.getLogger()
+    private val logger = KStats.instance.logger
 
     private val providers = CopyOnWriteArrayList<StatProvider>()
 

@@ -80,7 +80,7 @@ class KStats : JavaPlugin(), KStatsAPI {
 
         logger.info("KStats已启用。API版本: ${pluginMeta.version}")
 
-        if(!Bukkit.getOnlinePlayers().isEmpty()){
+        if (!Bukkit.getOnlinePlayers().isEmpty()) {
             midInitPlayerStat()
         }
     }
@@ -102,7 +102,7 @@ class KStats : JavaPlugin(), KStatsAPI {
         logger.info("KStats已禁用")
     }
 
-    private fun registerSubTitles(){
+    private fun registerSubTitles() {
         val registration = Bukkit.getServicesManager().getRegistration(HSubTitleAPI::class.java)
         if (registration != null) {
             subTitleApi = registration.provider
@@ -130,7 +130,7 @@ class KStats : JavaPlugin(), KStatsAPI {
         pm.registerEvents(PlayerDeathListener(), this)
     }
 
-    private fun midInitPlayerStat(){
+    private fun midInitPlayerStat() {
         Bukkit.getOnlinePlayers().forEach {
             statManager.initPlayerStats(it)
             it.getAttribute(Attribute.MAX_HEALTH)?.baseValue = CacheService.DISPLAY_MAX_HEALTH

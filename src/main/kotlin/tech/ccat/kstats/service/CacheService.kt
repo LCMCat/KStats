@@ -45,7 +45,7 @@ class CacheService : PlayerStatDao {
 
     fun getMana(uuid: UUID): Double {
         return manaCache.getOrDefault(uuid,
-            KStats.instance.configManager.statConfig.getDefaultStats().wisdom)
+            KStats.instance.configManager.statConfig.getDefaultWisdom())
     }
 
     fun setMana(uuid: UUID, amount: Double) {

@@ -6,7 +6,7 @@ import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import tech.ccat.kstats.util.MessageFormatter
 
-class CommandManager() : TabExecutor {
+class CommandManager : TabExecutor {
     private val commands = mutableMapOf<String, AbstractCommand>()
 
     fun registerCommand(command: AbstractCommand) {
@@ -15,7 +15,7 @@ class CommandManager() : TabExecutor {
 
     override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
 
-        if(args.isEmpty()){
+        if (args.isEmpty()) {
             if (sender is Player) {
                 val showCommand = commands["show"]
                 if (showCommand != null) {
@@ -33,7 +33,6 @@ class CommandManager() : TabExecutor {
             sendSenderHelp(sender)
             return true
         }
-
 
         if (subCommand.playerOnly && sender !is Player) {
             sender.sendMessage(MessageFormatter.format("player-not-found"))
@@ -73,7 +72,7 @@ class CommandManager() : TabExecutor {
         return subCommand.onTabComplete(sender, args)
     }
 
-    private fun sendSenderHelp(sender: CommandSender){
+    private fun sendSenderHelp(sender: CommandSender) {
 
         // 构建可用命令的帮助信息
         val available = getAvailableCommands(sender)
@@ -86,7 +85,7 @@ class CommandManager() : TabExecutor {
         }
     }
 
-    //获取命令执行者可用的命令
+    // 获取命令执行者可用的命令
     private fun getAvailableCommands(sender: CommandSender): List<AbstractCommand> {
         return commands.values.filter { command ->
             (!command.playerOnly || sender is Player) &&

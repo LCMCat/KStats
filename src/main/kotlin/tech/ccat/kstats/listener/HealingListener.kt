@@ -13,7 +13,7 @@ class HealingListener : Listener {
     private val healingTasks = hashMapOf<UUID, HealingTask>()
     private val manaRegenTasks = hashMapOf<UUID, ManaRegenTask>()
 
-    internal fun addPlayerToTask(player: Player){
+    internal fun addPlayerToTask(player: Player) {
         healingTasks[player.uniqueId] = HealingTask(player).apply {
             start()
         }

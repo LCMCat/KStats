@@ -30,7 +30,7 @@ class PlayerLoginListener : Listener {
     }
 
     @EventHandler
-    fun onPlayerRespawn(event: PlayerRespawnEvent){
+    fun onPlayerRespawn(event: PlayerRespawnEvent) {
         val player = event.player
         plugin.cacheService.heal(player)
     }

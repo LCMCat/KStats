@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import tech.ccat.kstats.KStats
+import tech.ccat.kstats.model.PlayerStat
 import tech.ccat.kstats.util.CombatEngine
 import tech.ccat.kstats.util.MessageFormatter
 
@@ -19,9 +20,9 @@ class CriticalHitListener : Listener {
             else -> return
         }
 
-        val stats = KStats.instance.statManager.getAllStats(damager)
+        val stats = KStats.instance.getAllStats(damager)
 
-        if (CombatEngine.isCritical(stats.critChance)) {
+        if (stats is PlayerStat && CombatEngine.isCritical(stats.critChance)) {
             event.damage *= (1 + stats.critDamage / 100)
             damager.sendMessage(
                 MessageFormatter.format("critical-hit", event.damage)

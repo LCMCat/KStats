@@ -1,8 +1,8 @@
 package tech.ccat.kstats.util
 
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 import tech.ccat.kstats.KStats
+import tech.ccat.kstats.model.PlayerStat
 import kotlin.random.Random
 
 object CombatEngine {
@@ -12,9 +12,8 @@ object CombatEngine {
 
         var damage = baseDamage * (1 + attackerStats.strength / 100)
 
-        if (attacker is Player) {
-            val playerStat = KStats.instance.statManager.getAllStats(attacker)
-            damage *= playerStat.damageMultiplier
+        if (attackerStats is PlayerStat) {
+            damage *= attackerStats.damageMultiplier
         }
 
         val defense = defenderStats.defense

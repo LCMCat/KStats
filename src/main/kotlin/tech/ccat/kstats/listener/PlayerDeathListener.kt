@@ -37,94 +37,53 @@ class PlayerDeathListener : Listener {
             else -> null
         }
 
-        return when (cause) {
-            EntityDamageEvent.DamageCause.VOID -> {
-                if (killerName != null) {
-                    "§4☠ §r§c$playerName §r§7被 §r§c$killerName§r§7击入虚空。"
-                } else {
-                    "§4☠ §r§c$playerName §r§7掉入了虚空。"
-                }
-            }
-            EntityDamageEvent.DamageCause.FALL -> {
-                if (killerName != null) {
-                    "§4☠ §r§c$playerName §r§7在 §r§c$killerName§r§7的帮助下摔死了。"
-                } else {
-                    "§4☠ §r§c$playerName §r§7摔死了。"
-                }
-            }
-            EntityDamageEvent.DamageCause.FLY_INTO_WALL -> {
-                "§4☠ §r§c$playerName §r§7撞击墙壁身亡。"
-            }
+        val messageKey = getMessageKey(cause, killerName != null)
+        return KStats.instance.configManager.messageConfig.getDeathMessage(messageKey, playerName, killerName)
+    }
+
+    private fun getMessageKey(cause: EntityDamageEvent.DamageCause?, hasKiller: Boolean): String {
+        val baseKey = when (cause) {
+            EntityDamageEvent.DamageCause.VOID -> "death.void"
+            EntityDamageEvent.DamageCause.FALL -> "death.fall"
+            EntityDamageEvent.DamageCause.FLY_INTO_WALL -> "death.fly-into-wall"
             EntityDamageEvent.DamageCause.FIRE,
             EntityDamageEvent.DamageCause.FIRE_TICK,
-            EntityDamageEvent.DamageCause.LAVA -> {
-                "§4☠ §r§c$playerName §r§7被烧死了。"
-            }
-            EntityDamageEvent.DamageCause.DROWNING -> {
-                "§4☠ §r§c$playerName §r§7溺水身亡。"
-            }
-            EntityDamageEvent.DamageCause.SUFFOCATION -> {
-                "§4☠ §r§c$playerName §r§7窒息而死。"
-            }
-            EntityDamageEvent.DamageCause.CONTACT -> {
-                "§4☠ §r§c$playerName §r§7被仙人掌扎死了。"
-            }
-            EntityDamageEvent.DamageCause.MAGIC -> {
-                "§4☠ §r§c$playerName §r§7被魔法击杀。"
-            }
-            EntityDamageEvent.DamageCause.WITHER -> {
-                "§4☠ §r§c$playerName §r§7凋零而死。"
-            }
-            EntityDamageEvent.DamageCause.POISON -> {
-                "§4☠ §r§c$playerName §r§7中毒身亡。"
-            }
-            EntityDamageEvent.DamageCause.STARVATION -> {
-                "§4☠ §r§c$playerName §r§7饿死了。"
-            }
+            EntityDamageEvent.DamageCause.LAVA -> "death.fire"
+            EntityDamageEvent.DamageCause.DROWNING -> "death.drowning"
+            EntityDamageEvent.DamageCause.SUFFOCATION -> "death.suffocation"
+            EntityDamageEvent.DamageCause.CONTACT -> "death.contact"
+            EntityDamageEvent.DamageCause.MAGIC -> "death.magic"
+            EntityDamageEvent.DamageCause.WITHER -> "death.wither"
+            EntityDamageEvent.DamageCause.POISON -> "death.poison"
+            EntityDamageEvent.DamageCause.STARVATION -> "death.starvation"
             EntityDamageEvent.DamageCause.ENTITY_ATTACK,
-            EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK -> {
-                if (killerName != null) {
-                    "§4☠ §r§c$playerName §r§7被 §r§c$killerName§r§7击杀。"
-                } else {
-                    "§4☠ §r§c$playerName §r§7被击杀。"
-                }
-            }
-            EntityDamageEvent.DamageCause.PROJECTILE -> {
-                if (killerName != null) {
-                    "§4☠ §r§c$playerName §r§7被 §r§c$killerName§r§7射杀。"
-                } else {
-                    "§4☠ §r§c$playerName §r§7被射杀。"
-                }
-            }
-            EntityDamageEvent.DamageCause.THORNS -> {
-                if (killerName != null) {
-                    "§4☠ §r§c$playerName §r§7被 §r§c$killerName§r§7的反伤击杀。"
-                } else {
-                    "§4☠ §r§c$playerName §r§7被反伤击杀。"
-                }
-            }
-            EntityDamageEvent.DamageCause.HOT_FLOOR -> {
-                "§4☠ §r§c$playerName §r§7被烫死了。"
-            }
-            EntityDamageEvent.DamageCause.CRAMMING -> {
-                "§4☠ §r§c$playerName §r§7被挤压而死。"
-            }
-            EntityDamageEvent.DamageCause.DRYOUT -> {
-                "§4☠ §r§c$playerName §r§7脱水而死。"
-            }
-            EntityDamageEvent.DamageCause.FREEZE -> {
-                "§4☠ §r§c$playerName §r§7冻死了。"
-            }
-            EntityDamageEvent.DamageCause.KILL -> {
-                if (killerName != null) {
-                    "§4☠ §r§c$playerName §r§7被 §r§c$killerName§r§7击杀。"
-                } else {
-                    "§4☠ §r§c$playerName §r§7死亡了。"
-                }
-            }
-            else -> {
-                "§4☠ §r§c$playerName §r§7死亡了。"
-            }
+            EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK -> "death.entity-attack"
+            EntityDamageEvent.DamageCause.PROJECTILE -> "death.projectile"
+            EntityDamageEvent.DamageCause.THORNS -> "death.thorns"
+            EntityDamageEvent.DamageCause.HOT_FLOOR -> "death.hot-floor"
+            EntityDamageEvent.DamageCause.CRAMMING -> "death.cramming"
+            EntityDamageEvent.DamageCause.DRYOUT -> "death.dryout"
+            EntityDamageEvent.DamageCause.FREEZE -> "death.freeze"
+            EntityDamageEvent.DamageCause.KILL -> "death.kill"
+            else -> "death.unknown"
         }
+
+        return if (hasKiller && hasKillerVariant(cause)) {
+            "$baseKey-by"
+        } else {
+            baseKey
+        }
+    }
+
+    private fun hasKillerVariant(cause: EntityDamageEvent.DamageCause?): Boolean {
+        return cause in setOf(
+            EntityDamageEvent.DamageCause.VOID,
+            EntityDamageEvent.DamageCause.FALL,
+            EntityDamageEvent.DamageCause.ENTITY_ATTACK,
+            EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK,
+            EntityDamageEvent.DamageCause.PROJECTILE,
+            EntityDamageEvent.DamageCause.THORNS,
+            EntityDamageEvent.DamageCause.KILL
+        )
     }
 }

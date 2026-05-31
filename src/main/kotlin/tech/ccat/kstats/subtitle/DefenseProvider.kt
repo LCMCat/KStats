@@ -15,7 +15,7 @@ object DefenseProvider : TextProvider {
 
         val defense = format.format(KStats.instance.getStat(player, StatType.DEFENSE))
 
-        if(defense == "0" || defense == null){
+        if (defense == "0") {
             return Info("", 0)
         }
 

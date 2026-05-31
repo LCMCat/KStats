@@ -18,7 +18,7 @@ class ShowCommand : AbstractCommand(
                 return true
             }
         } else {
-            if(sender !is Player){
+            if (sender !is Player) {
                 sender.sendMessage(MessageFormatter.format("player-command"))
                 return true
             } else {

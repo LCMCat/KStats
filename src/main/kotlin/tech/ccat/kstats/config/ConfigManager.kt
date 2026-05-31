@@ -4,7 +4,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import tech.ccat.kstats.KStats
 import java.io.File
 
-class ConfigManager() {
+class ConfigManager {
     private val plugin = KStats.instance
 
     private val configs = mutableMapOf<String, YamlConfiguration>()
